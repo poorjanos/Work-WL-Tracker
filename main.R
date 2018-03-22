@@ -1,3 +1,7 @@
+# Procedure for near-time tracking of workloads
+# Writes log on local storage and outputs plots to visually track wl
+# Script can be run 5 mins apart at minium (at best: 30 mins)
+
 # Redirect stdout to logfile
 scriptLog <- file("scriptLog", open = "wt")
 sink(scriptLog, type = "message")
@@ -13,6 +17,8 @@ library(lubridate)
 # Quit if sysdate == weekend ------------------------------------------------------------
 stopifnot(!(strftime(Sys.Date(), '%u') == 1 | hour(Sys.time()) >= 18))
 
+# Create default dirs
+dir.create(here::here("Reports"), showWarnings = FALSE)
 
 ##########################################################################################
 # Extract Data ###########################################################################
