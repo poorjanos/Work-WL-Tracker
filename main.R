@@ -11,7 +11,7 @@ library(dplyr)
 library(lubridate)
 
 # Quit if sysdate == weekend ------------------------------------------------------------
-stopifnot(!(strftime(Sys.Date(),'%u') == 1 | hour(Sys.time())>=18))
+stopifnot(!(strftime(Sys.Date(), '%u') == 1 | hour(Sys.time()) >= 18))
 
 
 ##########################################################################################
@@ -61,8 +61,8 @@ snapshot_v3 <- dbGetQuery(jdbcConnection, WL_tracker)
 
 # Close connection
 dbDisconnect(jdbcConnection)
-  
-  
+
+
 #########################################################################################
 # Set Up Folder Struct to Save Results ##################################################
 #########################################################################################
@@ -74,9 +74,10 @@ dirlist <-
 hits_dir <-
   unlist(sapply(dirlist, function(x)
     grepl(floor_date(Sys.Date(
+      
     ), "day"), x)))
-  
-if (sum(hits_dir)==0) {
+
+if (sum(hits_dir) == 0) {
   dir.create(here::here("Reports", floor_date(Sys.Date(), "day")))
 }
 
@@ -85,7 +86,7 @@ flist <-
   list.files(here::here("Reports", floor_date(Sys.Date(), "day")), ".csv")
 ma <- floor_date(Sys.Date(), "day")
 
-if(length(flist)==0) {
+if (length(flist) == 0) {
   history <- snapshot_v3
 } else {
   history <-
@@ -94,28 +95,28 @@ if(length(flist)==0) {
       floor_date(Sys.Date(), "day"),
       paste0("Snapshot_", ma, ".csv")
     ),
-    stringsAsFactors = FALSE
-    )
+    stringsAsFactors = FALSE)
   
   snapshot_v3 <-
-    snapshot_v3[!snapshot_v3$IDOPONT %in% unique(history$IDOPONT),] #duplikált idõpontok kizárása
-  history <- rbind(history, snapshot_v3)  
+    snapshot_v3[!snapshot_v3$IDOPONT %in% unique(history$IDOPONT), ] #duplikált idõpontok kizárása
+  history <- rbind(history, snapshot_v3)
 }
 
-write.csv(history, here::here(
-  "Reports",
-  floor_date(Sys.Date(), "day"),
-  paste0("Snapshot_", ma, ".csv")
-))
- 
+write.csv(history,
+          here::here(
+            "Reports",
+            floor_date(Sys.Date(), "day"),
+            paste0("Snapshot_", ma, ".csv")
+          ),
+          row.names = FALSE)
+
 
 #########################################################################################
 # Transform Data ########################################################################
 #########################################################################################
- 
 history$IDOPONT <- ymd_hms(history$IDOPONT)
 history <-
-  history[day(history$IDOPONT) == day(Sys.Date()),] # exclude cases leaking from prev day
+  history[day(history$IDOPONT) == day(Sys.Date()), ] # exclude cases leaking from prev day
 history$IDOPONT <- format(history$IDOPONT, "%H:%M")
 
 history$PRIORITAS <- as.factor(history$PRIORITAS)
@@ -156,16 +157,19 @@ history[is.na(history$TIPUS) == TRUE, "LEOSZTAS_OK"] <-
 history[is.na(history$TEV) == TRUE, "TEV"] <-
   "Egyéb" #TEV = NA recode
 
-history <- history %>% mutate(TIPUS = case_when(.$LEAN_TIP == 'AL' ~ paste('AL_', TIPUS),
-                                                .$LEAN_TIP == 'IL' ~ paste('IL_', TEV)))
+history <-
+  history %>% mutate(TIPUS = case_when(
+    .$LEAN_TIP == 'AL' ~ paste('AL_', TIPUS),
+    .$LEAN_TIP == 'IL' ~ paste('IL_', TEV)
+  ))
 
 history$SAPI <-
   as.factor(history$SAPI) # recode to factor
-  
+
+
 #########################################################################################
 # Plot WL ###############################################################################
 #########################################################################################
-
 for (i in levels(history[, "SAPI"])) {
   # Looping over sapis
   dirlist_sapi <-
@@ -184,11 +188,11 @@ for (i in levels(history[, "SAPI"])) {
   }
   
   #Plot TIPUS
-  history_tipus <- history[history[["SAPI"]] == i, ]
+  history_tipus <- history[history[["SAPI"]] == i,]
   history_tipus <-
     group_by(history_tipus, SAPI, IDOPONT, TIPUS, PRIORITAS) %>%
     summarize(DARAB = sum(DARAB))
-  history_tipus <- history_tipus[history_tipus[["DARAB"]] > 1,]
+  history_tipus <- history_tipus[history_tipus[["DARAB"]] > 1, ]
   
   if (!nrow(history_tipus) == 0) {
     p1 <- ggplot(history_tipus, aes(x = IDOPONT, y = DARAB)) +
@@ -202,11 +206,11 @@ for (i in levels(history[, "SAPI"])) {
   }
   
   #Plot: LEOSZTAS_OK
-  history_lok <- history[history[["SAPI"]] == i, ]
+  history_lok <- history[history[["SAPI"]] == i,]
   history_lok <-
     group_by(history_lok, SAPI, IDOPONT, LEOSZTAS_OK, PRIORITAS) %>%
     summarize(DARAB = sum(DARAB))
-  history_lok <- history_lok[history_lok[["DARAB"]] > 1,]
+  history_lok <- history_lok[history_lok[["DARAB"]] > 1, ]
   
   if (!nrow(history_lok) == 0) {
     p2 <- ggplot(history_lok, aes(x = IDOPONT, y = DARAB)) +
@@ -220,6 +224,7 @@ for (i in levels(history[, "SAPI"])) {
   }
   
   i <- chartr("áéóõöûüíÁÉÓÕÖÛÜÍ", "aeooouuiAEOOOUUI", i)
+  
   ggsave(
     here::here(
       "Reports",
@@ -232,6 +237,7 @@ for (i in levels(history[, "SAPI"])) {
     height = 7,
     dpi = 300
   )
+  
   ggsave(
     here::here(
       "Reports",
@@ -244,7 +250,6 @@ for (i in levels(history[, "SAPI"])) {
     height = 7,
     dpi = 300
   )
-  
 }
 
 # Redirect stdout back to console

@@ -4,6 +4,7 @@
 *.html
 *.png
 *.jpeg
+scriptLog
 
 # History files
 .Rhistory
