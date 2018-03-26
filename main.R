@@ -15,7 +15,7 @@ library(dplyr)
 library(lubridate)
 
 # Quit if sysdate == weekend ------------------------------------------------------------
-stopifnot(!(strftime(Sys.Date(), '%u') == 1 | hour(Sys.time()) >= 18))
+stopifnot(!(strftime(Sys.Date(), '%u') == 7 | hour(Sys.time()) >= 18))
 
 # Create default dirs
 dir.create(here::here("Reports"), showWarnings = FALSE)
@@ -239,9 +239,17 @@ for (i in levels(history[, "SAPI"])) {
       paste0("TIPUS_", i, ".png")
     ),
     p1,
-    width = 12,
+    width = 14,
     height = 7,
-    dpi = 300
+    dpi = 500
+  )
+  
+  ggsave(
+    "C:/Users/PoorJ/Desktop/Mischung/R/AFC_publish/Lean_snapshot.png",
+    p1,
+    width = 14,
+    height = 7,
+    dpi = 500
   )
   
   ggsave(
