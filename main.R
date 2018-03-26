@@ -13,6 +13,7 @@ library(ggplot2)
 library(scales)
 library(dplyr)
 library(lubridate)
+library(stringr)
 
 # Quit if sysdate == weekend ------------------------------------------------------------
 stopifnot(!(strftime(Sys.Date(), '%u') == 7 | hour(Sys.time()) >= 18))
@@ -163,11 +164,25 @@ history[is.na(history$TIPUS) == TRUE, "LEOSZTAS_OK"] <-
 history[is.na(history$TEV) == TRUE, "TEV"] <-
   "Egyéb" #TEV = NA recode
 
+
+
+
+
 history <-
-  history %>% mutate(TIPUS = case_when(
+  history %>% mutate(
+    TEV = case_when(
+      str_detect(.$TEV, "Függõ") ~ "Függõ díjkezelés",
+      str_detect(.$TEV, "Banki") ~ "Banki betöltés",
+      str_detect(.$TEV, "Igényfelmérõ") ~ "Igényfelmérõ",
+      TRUE ~ TEV
+    )
+  ) %>% mutate(TIPUS = case_when(
     .$LEAN_TIP == 'AL' ~ paste('AL_', TIPUS),
     .$LEAN_TIP == 'IL' ~ paste('IL_', TEV)
-  ))
+  )) %>%
+  group_by(TEV, LEAN_TIP, SAPI, IDOPONT, LEOSZTAS_OK, TIPUS, PRIORITAS) %>%
+  summarise(DARAB = sum(DARAB)) %>%
+  ungroup()
 
 history$SAPI <-
   as.factor(history$SAPI) # recode to factor
@@ -176,7 +191,7 @@ history$SAPI <-
 #########################################################################################
 # Plot WL ###############################################################################
 #########################################################################################
-for (i in levels(history[, "SAPI"])) {
+for (i in levels(history[["SAPI"]])) {
   # Looping over sapis
   dirlist_sapi <-
     list.dirs(here::here("Reports", floor_date(Sys.Date(), "day")),
