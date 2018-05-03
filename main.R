@@ -26,7 +26,7 @@ dir.create(here::here("Reports"), showWarnings = FALSE)
 ##########################################################################################
 
 # Set JAVA_HOME, set max. memory, and load rJava library
-Sys.setenv(JAVA_HOME = "C:\\Program Files\\Java\\jre1.8.0_60")
+Sys.setenv(JAVA_HOME = "C:\\Program Files\\Java\\jre1.8.0_171")
 options(java.parameters = "-Xmx2g")
 library(rJava)
 
