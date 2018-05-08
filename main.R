@@ -239,7 +239,7 @@ for (i in levels(history[["SAPI"]])) {
       facet_grid(PRIORITAS ~ LEOSZTAS_OK,  labeller = label_wrap_gen(width =
                                                                        0.1)) +
       theme(strip.text.y = element_text(size = 10, angle = 0)) +
-      theme(axis.text.x = element_text(size = 8, angle = 90)) +
+      theme(axis.text.x = element_text(size = 6, angle = 90)) +
       theme(axis.text.y = element_text(size = 6)) +
       ggtitle(sprintf("%s gyûjtõ tartalma prioritások szerint", i))
   }
