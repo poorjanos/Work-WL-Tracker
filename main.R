@@ -260,7 +260,7 @@ for (i in levels(history[["SAPI"]])) {
   )
   
   ggsave(
-    "C:/Users/PoorJ/Publish/Dashboards/Lean_snapshot.png",
+    "C:/Users/PoorJ/Publish/Live/Lean_snapshot.png",
     p1,
     width = 14,
     height = 7,
