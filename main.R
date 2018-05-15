@@ -259,13 +259,14 @@ for (i in levels(history[["SAPI"]])) {
     dpi = 500
   )
   
+  try(
   ggsave(
-    "C:/Users/PoorJ/Publish/Live/Lean_snapshot.png",
+    "C:/Users/PoorJ/Publish/Live/Lean-Snapshot/Lean_snapshot.png",
     p1,
     width = 14,
     height = 7,
     dpi = 500
-  )
+  ))
   
   ggsave(
     here::here(
