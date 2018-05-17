@@ -224,7 +224,17 @@ for (i in levels(history[["SAPI"]])) {
       theme(axis.text.x = element_text(size = 8, angle = 90)) +
       theme(axis.text.y = element_text(size = 6)) +
       ggtitle(sprintf("%s gyûjtõ tartalma prioritások szerint", i))
-  }
+  
+     p1_2 <- ggplot(history_tipus, aes(x = IDOPONT, y = DARAB)) +
+      geom_bar(stat = "identity") +
+      facet_grid(PRIORITAS ~ TIPUS, scales = 'free') +
+      theme(strip.text.y = element_text(size = 8, angle = 0)) +
+      theme(strip.text.x = element_text(size = 8, angle = 90)) +
+      theme(axis.text.x = element_text(size = 8, angle = 90)) +
+      theme(axis.text.y = element_text(size = 6)) +
+      ggtitle(sprintf("%s gyûjtõ tartalma prioritások szerint", i))
+    }
+  
   
   #Plot: LEOSZTAS_OK
   history_lok <- history[history[["SAPI"]] == i,]
@@ -251,7 +261,7 @@ for (i in levels(history[["SAPI"]])) {
       "Reports",
       floor_date(Sys.Date(), "day"),
       i,
-      paste0("TIPUS_", i, ".png")
+      paste0("TIPUS_", i, "_abs", ".png")
     ),
     p1,
     width = 14,
@@ -259,14 +269,36 @@ for (i in levels(history[["SAPI"]])) {
     dpi = 500
   )
   
+  ggsave(
+    here::here(
+      "Reports",
+      floor_date(Sys.Date(), "day"),
+      i,
+      paste0("TIPUS_", i, "_rel", ".png")
+    ),
+    p1_2,
+    width = 14,
+    height = 7,
+    dpi = 500
+  )
+  
   try(
   ggsave(
-    "C:/Users/PoorJ/Publish/Live/Lean-Snapshot/Lean_snapshot.png",
+    "C:/Users/PoorJ/Publish/Live/Lean-Snapshot/Lean_snapshot_abs.png",
     p1,
     width = 14,
     height = 7,
     dpi = 500
   ))
+  
+  try(
+    ggsave(
+      "C:/Users/PoorJ/Publish/Live/Lean-Snapshot/Lean_snapshot_rel.png",
+      p1_2,
+      width = 14,
+      height = 7,
+      dpi = 500
+    ))
   
   ggsave(
     here::here(
